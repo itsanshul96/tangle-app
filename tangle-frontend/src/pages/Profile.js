@@ -14,26 +14,25 @@ const Profile = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const fetchProfile = async () => {
-    try {
-      const res = await API.get('/users/me');
-      setProfile(res.data);
-      setFormData({
-        name: res.data.name || '',
-        age: res.data.age || '',
-        gender: res.data.gender || '',
-        intent: res.data.intent || '',
-      });
-    } catch (err) {
-      setError('Unauthorized. Please login again.');
-      localStorage.removeItem('tangle_token');
-      navigate('/login');
-    }
-  };
-
   useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await API.get('/users/me');
+        setProfile(res.data);
+        setFormData({
+          name: res.data.name || '',
+          age: res.data.age || '',
+          gender: res.data.gender || '',
+          intent: res.data.intent || '',
+        });
+      } catch (err) {
+        setError('Unauthorized. Please login again.');
+        localStorage.removeItem('tangle_token');
+        navigate('/login');
+      }
+    };
     fetchProfile();
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
