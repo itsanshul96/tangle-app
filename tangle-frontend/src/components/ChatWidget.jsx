@@ -43,6 +43,14 @@ const ChatWidget = () => {
   }, [messages, isTyping]);
 
   useEffect(() => {
+    const scrollToBottom = () => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+    window.visualViewport?.addEventListener("resize", scrollToBottom);
+    return () => window.visualViewport?.removeEventListener("resize", scrollToBottom);
+  }, []);
+
+  useEffect(() => {
     const msg1 = onboardingFlow[0].message;
     const msg2 = onboardingFlow[1].message;
     const delay1 = typingDelay(msg1);
@@ -121,7 +129,7 @@ const ChatWidget = () => {
   };
 
   return (
-    <div className="w-full max-w-md h-[680px] rounded-[28px] bg-[#0f0b14] border border-white/10 shadow-2xl overflow-hidden flex flex-col">
+    <div className="w-full md:max-w-md h-full md:h-[680px] rounded-none md:rounded-[28px] bg-[#0f0b14] border-0 md:border border-white/10 shadow-2xl overflow-hidden flex flex-col">
       {/* Header */}
       <div className="px-5 py-4 border-b border-white/10 bg-[#16101d] flex items-center gap-3 shrink-0">
         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#e8547a] to-[#9b59b6] flex items-center justify-center text-white text-sm font-bold shrink-0">
@@ -185,7 +193,7 @@ const ChatWidget = () => {
                 onKeyDown={(e) => e.key === "Enter" && handleInputSubmit()}
                 disabled={isTyping}
                 placeholder={isTyping ? "" : "Type here..."}
-                className="flex-1 rounded-xl px-4 py-3 bg-white/10 text-white text-sm placeholder:text-white/30 outline-none disabled:opacity-40 transition-opacity"
+                className="flex-1 rounded-xl px-4 py-3 bg-white/10 text-white text-base md:text-sm placeholder:text-white/30 outline-none disabled:opacity-40 transition-opacity"
               />
               <button
                 onClick={handleInputSubmit}
