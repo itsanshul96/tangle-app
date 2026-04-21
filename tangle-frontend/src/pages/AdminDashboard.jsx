@@ -69,10 +69,18 @@ const AdminDashboard = () => {
     return () => clearTimeout(t);
   }, [search, intentFilter, fetchLeads]);
 
-  const handleExport = () => {
-    const token = localStorage.getItem("tangle_token");
-    const base  = process.env.REACT_APP_API_BASE || "http://localhost:5050/api";
-    window.open(`${base}/community/export?token=${token}`, "_blank");
+  const handleExport = async () => {
+    try {
+      const res = await API.get("/community/export", { responseType: "blob" });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "tangle-community-leads.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("Export failed. Make sure you're logged in as admin.");
+    }
   };
 
   const logout = () => {
@@ -197,12 +205,19 @@ const AdminDashboard = () => {
                           month: "short", day: "numeric", year: "numeric",
                         })}
                       </td>
-                      <td className="px-5 py-3.5">
+                      <td className="px-5 py-3.5 max-w-[240px]">
                         <button
                           onClick={() => setSelected(lead)}
-                          className="text-[#e8547a] hover:text-[#f2a0b0] text-xs transition-colors"
+                          className="text-left group w-full"
                         >
-                          Read →
+                          <span className="text-white/50 text-xs leading-5 line-clamp-2 group-hover:text-white/80 transition-colors">
+                            {lead.story
+                              ? lead.story.length > 80
+                                ? lead.story.slice(0, 80) + "…"
+                                : lead.story
+                              : <span className="text-white/20 italic">No story</span>
+                            }
+                          </span>
                         </button>
                       </td>
                     </tr>

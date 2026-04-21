@@ -1,128 +1,119 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import API from '../services/api';
-import Logo from '../assets/brandLogo.png'; // Assuming you have added a soft background logo
+
+const INTENTS = ['Serious', 'Casual', 'Exploring', 'Healing'];
 
 const Register = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    age: '',
-    gender: '',
-    intent: 'Undecided',
+    name: '', email: '', password: '', age: '', gender: '', intent: 'Serious',
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleIntentClick = (intentValue) => {
-    setFormData({ ...formData, intent: intentValue });
+    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await API.post('/users/register', formData);
       localStorage.setItem('tangle_token', res.data.token);
       navigate('/profile');
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const inputClass = "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-base placeholder:text-white/20 outline-none focus:border-[#e8547a]/50 transition-colors";
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fcdedf] to-[#fce2e4] relative flex items-center justify-center font-serif overflow-hidden">
-      {/* Soft background logo */}
-      <img
-        src={Logo}
-        alt="Tangle background logo"
-        className="absolute opacity-10 w-[600px] h-[600px] object-contain top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-      />
-
-      <div className="bg-white/60 backdrop-blur-md rounded-3xl shadow-lg p-8 w-full max-w-md text-center border border-rose-100 z-10">
-        <h2 className="text-2xl font-bold text-[#4c1d95] mb-4">Create a Profile</h2>
-        {error && <p className="text-red-500 mb-2">{error}</p>}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            required
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full p-3 rounded-xl text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rose-300"
-          />
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            required
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 rounded-xl text-gray-800 border border-gray-300"
-          />
-
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-3 rounded-xl text-gray-800 border border-gray-300"
-          />
-
-          <input
-            type="number"
-            name="age"
-            placeholder="Age"
-            required
-            value={formData.age}
-            onChange={handleChange}
-            className="w-full p-3 rounded-xl text-gray-800 border border-gray-300"
-          />
-
-          <input
-            type="text"
-            name="gender"
-            placeholder="Gender"
-            required
-            value={formData.gender}
-            onChange={handleChange}
-            className="w-full p-3 rounded-xl text-gray-800 border border-gray-300"
-          />
-
-          {/* Relationship Intent Toggle */}
-          <div className="flex justify-center gap-3 mb-2">
-            {['Casual', 'Undecided', 'Serious'].map((option) => (
-              <button
-                type="button"
-                key={option}
-                onClick={() => handleIntentClick(option)}
-                className={`px-4 py-2 rounded-full border transition text-sm font-medium ${
-                  formData.intent === option
-                    ? 'bg-[#f472b6] text-white border-transparent'
-                    : 'bg-white text-gray-600 border-gray-300'
-                }`}
-              >
-                {option}
-              </button>
-            ))}
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0710] via-[#120d18] to-[#1a0f28] flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#e8547a] to-[#9b59b6] flex items-center justify-center text-white text-xl font-bold mb-4">
+            T
           </div>
+          <h1 className="text-white font-serif text-2xl font-semibold">Create your profile</h1>
+          <p className="text-white/40 text-sm mt-1">Join Tangle</p>
+        </div>
 
-          <button
-            type="submit"
-            className="w-full bg-[#ec4899] hover:bg-[#db2777] text-white py-3 rounded-xl font-medium transition"
-          >
-            Continue
-          </button>
-        </form>
+        <div className="bg-[#16101d] border border-white/10 rounded-2xl p-6">
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="text-white/40 text-xs uppercase tracking-wider mb-1.5 block">Name</label>
+              <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Your name" required className={inputClass} />
+            </div>
+
+            <div>
+              <label className="text-white/40 text-xs uppercase tracking-wider mb-1.5 block">Email</label>
+              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" required className={inputClass} />
+            </div>
+
+            <div>
+              <label className="text-white/40 text-xs uppercase tracking-wider mb-1.5 block">Password</label>
+              <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required className={inputClass} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-white/40 text-xs uppercase tracking-wider mb-1.5 block">Age</label>
+                <input type="number" name="age" value={formData.age} onChange={handleChange} placeholder="25" required className={inputClass} />
+              </div>
+              <div>
+                <label className="text-white/40 text-xs uppercase tracking-wider mb-1.5 block">Gender</label>
+                <input type="text" name="gender" value={formData.gender} onChange={handleChange} placeholder="How you identify" required className={inputClass} />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-white/40 text-xs uppercase tracking-wider mb-2 block">Looking for</label>
+              <div className="grid grid-cols-2 gap-2">
+                {INTENTS.map((option) => (
+                  <button
+                    type="button"
+                    key={option}
+                    onClick={() => setFormData({ ...formData, intent: option })}
+                    className={`py-2.5 rounded-xl text-sm transition-colors ${
+                      formData.intent === option
+                        ? 'bg-[#e8547a] text-white'
+                        : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10'
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-[#e8547a] to-[#c0395e] text-white py-3 rounded-xl font-medium transition hover:opacity-90 disabled:opacity-50"
+            >
+              {loading ? 'Creating account…' : 'Create Account'}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-white/30 text-sm mt-6">
+          Already have an account?{' '}
+          <Link to="/login" className="text-[#e8547a] hover:text-[#f2a0b0] transition-colors">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );
